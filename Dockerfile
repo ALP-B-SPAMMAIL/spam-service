@@ -7,13 +7,16 @@ WORKDIR /app
 COPY . /app
 
 # Gradle 빌드 실행
-RUN ./gradlew clean build --no-daemon --stacktrace
+RUN ./gradlew clean bootJar --no-daemon --stacktrace
 
 # 최종 실행 이미지
 FROM openjdk:17-jdk-slim
 
 # 빌드한 JAR 파일 복사
 COPY --from=build /app/build/libs/*.jar /app/app.jar
+
+# 9. 카프카 설정 (환경 변수 설정)
+ENV KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
 # 앱 실행 명령
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
