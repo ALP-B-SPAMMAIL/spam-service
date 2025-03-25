@@ -20,17 +20,7 @@ spec:
           image: team04registry.azurecr.io/spam-service:latest  # 사용할 컨테이너 이미지 (ACR에서 가져옴)
           ports:
             - containerPort: 8080
-<<<<<<< HEAD
-      # imagePullSecrets:
-      #   - name: acr-secret
-=======
->>>>>>> 91de65cbdaacd4e5df9136d0aff48032c73e5bc4
-          # envFrom:   # 여기는 환경 변수 설정 -> 나중에 수정하기 
-          #   - configMapRef:
-          #       name: spam-service-config
-          #   - secretRef:
-          #       name: spam-service-secret
-          resources:  # 여기는 리소스 스펙 -> 얘도 나중에 수정
+          resources: 
             limits:
               memory: "512Mi"
               cpu: "500m"
