@@ -17,11 +17,11 @@ spec:
     spec:
       containers:
         - name: spam-service  # 컨테이너 이름
-          image: myregistry.azurecr.io/spam-service:latest  # 사용할 컨테이너 이미지 (ACR에서 가져옴)
+          image: team04registry.azurecr.io/spam-service:latest  # 사용할 컨테이너 이미지 (ACR에서 가져옴)
           ports:
             - containerPort: 8080
-      imagePullSecrets:
-        - name: acr-secret
+      # imagePullSecrets:
+      #   - name: acr-secret
           # envFrom:   # 여기는 환경 변수 설정 -> 나중에 수정하기 
           #   - configMapRef:
           #       name: spam-service-config
