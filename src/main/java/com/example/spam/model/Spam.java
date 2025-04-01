@@ -25,7 +25,13 @@ public class Spam {
     private String mailContent;
     private LocalDateTime whenArrived;
 
+    private String reason;
+
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

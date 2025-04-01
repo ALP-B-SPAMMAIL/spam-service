@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.spam.event.NotSpamDetectedEvent;
 import com.example.spam.event.SpamDetectedEvent;
+import com.example.spam.eventDto.MailChangedToNormalEventDto;
+import com.example.spam.eventDto.MailChangedToSpamEventDto;
 import com.example.spam.eventDto.MailInboundedEventDto;
 import com.example.spam.eventDto.NotSpamDetectedEventDto;
 import com.example.spam.eventDto.SpamDetectedEventDto;
@@ -14,6 +16,8 @@ import com.example.spam.model.Spam;
 import com.example.spam.repository.SpamRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class SpamService {
     @Autowired
@@ -21,6 +25,7 @@ public class SpamService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
+    @Transactional
     public boolean isSpam(MailInboundedEventDto mailInboundedEventDto) {
             try {        
                 System.out.println("isSpam called");
@@ -50,10 +55,28 @@ public class SpamService {
         return false;
     }
 
+    @Transactional
     public void assignSpamTopic(TopicExtractedEventDto topicExtractedEventDto) {
         Spam spam = spamRepository.findById(topicExtractedEventDto.getMailId()).orElse(null);
         if (spam != null) {
             spam.setTopic(topicExtractedEventDto.getTopic());
+            spamRepository.save(spam);
+        }
+    }
+
+    @Transactional
+    public void deleteSpam(MailChangedToNormalEventDto mailChangedToNormalEventDto) {
+        Spam spam = spamRepository.findById(mailChangedToNormalEventDto.getMailId()).orElse(null);
+        if (spam != null) {
+            spamRepository.delete(spam);
+        }
+    }
+
+    @Transactional
+    public void addSpam(MailChangedToSpamEventDto mailChangedToSpamEventDto) {
+        Spam spam = spamRepository.findById(mailChangedToSpamEventDto.getMailId()).orElse(null);
+        if (spam != null) {
+            spam.setReason(mailChangedToSpamEventDto.getReason());
             spamRepository.save(spam);
         }
     }
