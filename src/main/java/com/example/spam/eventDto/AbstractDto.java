@@ -1,7 +1,9 @@
 package com.example.spam.eventDto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class AbstractDto {
 }
