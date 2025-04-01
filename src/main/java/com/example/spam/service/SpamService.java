@@ -8,6 +8,7 @@ import com.example.spam.event.SpamDetectedEvent;
 import com.example.spam.eventDto.MailInboundedEventDto;
 import com.example.spam.eventDto.NotSpamDetectedEventDto;
 import com.example.spam.eventDto.SpamDetectedEventDto;
+import com.example.spam.eventDto.TopicExtractedEventDto;
 import com.example.spam.kafka.KafkaProducer;
 import com.example.spam.model.Spam;
 import com.example.spam.repository.SpamRepository;
@@ -47,5 +48,13 @@ public class SpamService {
                 e.printStackTrace();
             }
         return false;
+    }
+
+    public void assignSpamTopic(TopicExtractedEventDto topicExtractedEventDto) {
+        Spam spam = spamRepository.findById(topicExtractedEventDto.getMailId()).orElse(null);
+        if (spam != null) {
+            spam.setTopic(topicExtractedEventDto.getTopic());
+            spamRepository.save(spam);
+        }
     }
 }

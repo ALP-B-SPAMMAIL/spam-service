@@ -12,12 +12,10 @@ public class MailInboundedEvent extends AbstractEvent {
 
     public MailInboundedEvent() {
         super();
-        this.topic = "mail";
     }
 
     public MailInboundedEvent(MailInboundedEventDto mailInboundedEventDto) {
         super(mailInboundedEventDto);
-        this.topic = "mail";
         this.payload = mailInboundedEventDto;
     }
 }

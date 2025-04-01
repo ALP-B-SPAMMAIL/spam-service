@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,11 @@ public class Spam {
 
     private String topic;
     private String sender;
+    @Lob
     private String mailContent;
     private LocalDateTime whenArrived;
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 }
