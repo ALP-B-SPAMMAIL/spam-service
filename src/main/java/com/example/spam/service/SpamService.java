@@ -1,10 +1,14 @@
 package com.example.spam.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.spam.event.NotSpamDetectedEvent;
 import com.example.spam.event.SpamDetectedEvent;
+import com.example.spam.event.requestDto.SearchAskDto;
+import com.example.spam.event.responseDto.SearchResultDto;
 import com.example.spam.eventDto.MailChangedToNormalEventDto;
 import com.example.spam.eventDto.MailChangedToSpamEventDto;
 import com.example.spam.eventDto.MailInboundedEventDto;
@@ -12,8 +16,13 @@ import com.example.spam.eventDto.NotSpamDetectedEventDto;
 import com.example.spam.eventDto.SpamDetectedEventDto;
 import com.example.spam.eventDto.TopicExtractedEventDto;
 import com.example.spam.kafka.KafkaProducer;
+import com.example.spam.model.Mail;
 import com.example.spam.model.Spam;
+import com.example.spam.model.SpamStatics;
+import com.example.spam.repository.MailRepository;
 import com.example.spam.repository.SpamRepository;
+import com.example.spam.repository.SpamStaticsRepository;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.transaction.Transactional;
@@ -24,6 +33,10 @@ public class SpamService {
     private SpamRepository spamRepository;
     @Autowired
     private KafkaProducer kafkaProducer;
+    @Autowired
+    private SpamStaticsRepository spamStaticsRepository;
+    @Autowired
+    private MailRepository mailRepository;
 
     @Transactional
     public boolean isSpam(MailInboundedEventDto mailInboundedEventDto) {
@@ -78,6 +91,44 @@ public class SpamService {
         if (spam != null) {
             spam.setReason(mailChangedToSpamEventDto.getReason());
             spamRepository.save(spam);
+
+            Mail mail = mailRepository.findByMailId(mailChangedToSpamEventDto.getMailId()).get();
+
+            Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(mail.getMailSender());
+            
+            if(spamStatic.isPresent()){
+                SpamStatics spamO = spamStatic.get();
+                spamO.setCount(spamO.getCount()+1);
+                spamO.setReason(spam.getReason());
+                spamStaticsRepository.save(spamO);
+            }
+            else{
+                SpamStatics spamN = new SpamStatics();
+                spamN.setSender(mail.getMailSender());
+                spamN.setCount(1L);
+                spamN.setReason(spam.getReason());
+                spamN.setTopic(spam.getTopic());
+
+                spamStaticsRepository.save(spamN);
+            }
+
         }
+    }
+
+    @Transactional
+    public SearchResultDto findSpam(SearchAskDto searchAskDto){
+        Optional<SpamStatics> spamStatics = spamStaticsRepository.findBySender(searchAskDto.getSender());
+        SearchResultDto searchResultDto = new SearchResultDto();
+        
+        if(spamStatics.isPresent()){
+            SpamStatics spamm = spamStatics.get();
+            searchResultDto.setCount(spamm.getCount());
+            searchResultDto.setSender(spamm.getSender());
+            searchResultDto.setTopic(spamm.getTopic());
+            searchResultDto.setReason(spamm.getReason());
+        }
+
+
+        return searchResultDto;
     }
 }
