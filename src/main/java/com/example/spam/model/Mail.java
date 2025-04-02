@@ -23,6 +23,7 @@ public class Mail {
     private String mailContent;  // 텍스트 형식의 메일 내용
     
     @Lob
+    @Column(columnDefinition="LONGTEXT")
     private String mailHtmlContent;  // HTML 형식의 메일 내용
     
     private String mailSender;

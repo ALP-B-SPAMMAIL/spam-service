@@ -2,6 +2,7 @@ package com.example.spam.service;
 
 import java.util.Optional;
 
+import org.apache.kafka.common.annotation.InterfaceStability;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,6 @@ import com.example.spam.model.SpamStatics;
 import com.example.spam.repository.MailRepository;
 import com.example.spam.repository.SpamRepository;
 import com.example.spam.repository.SpamStaticsRepository;
-import com.fasterxml.jackson.annotation.OptBoolean;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.transaction.Transactional;
@@ -95,6 +95,7 @@ public class SpamService {
             Mail mail = mailRepository.findByMailId(mailChangedToSpamEventDto.getMailId()).get();
 
             Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(mail.getMailSender());
+
             
             if(spamStatic.isPresent()){
                 SpamStatics spamO = spamStatic.get();
@@ -117,7 +118,16 @@ public class SpamService {
 
     @Transactional
     public SearchResultDto findSpam(SearchAskDto searchAskDto){
+        // String totalSender = searchAskDto.getSender();
+        // String[] senderSplit = totalSender.split(" ");
+        // String senderName = senderSplit[0].trim();
+        // String senderEmailT = senderSplit[1].trim();
+        // String senderEmail = senderEmailT.replaceAll("[<>]", "");
+
+        //Optional<SpamStatics> spamStatics = spamStaticsRepository.findBySender();
+
         Optional<SpamStatics> spamStatics = spamStaticsRepository.findBySender(searchAskDto.getSender());
+
         SearchResultDto searchResultDto = new SearchResultDto();
         
         if(spamStatics.isPresent()){

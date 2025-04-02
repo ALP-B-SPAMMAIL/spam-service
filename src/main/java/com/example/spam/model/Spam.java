@@ -2,7 +2,10 @@ package com.example.spam.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
@@ -17,11 +20,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Spam {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int mailId;
 
     private String topic;
     private String sender;
     @Lob
+    @Column(columnDefinition="LONGTEXT")
     private String mailContent;
     private LocalDateTime whenArrived;
 
