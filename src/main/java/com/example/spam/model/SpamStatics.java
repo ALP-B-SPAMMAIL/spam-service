@@ -22,9 +22,13 @@ import lombok.Setter;
 public class SpamStatics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer mailId;
     private String sender;
     private Long count;
     private String topic;
     private String reason;
+
+    public SpamStatics(Integer mailId){
+        this.mailId=mailId;
+    }
 }

@@ -1,8 +1,12 @@
 package com.example.spam.service;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.kafka.common.annotation.InterfaceStability;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +24,14 @@ import com.example.spam.kafka.KafkaProducer;
 import com.example.spam.model.Mail;
 import com.example.spam.model.Spam;
 import com.example.spam.model.SpamStatics;
+import com.example.spam.policy.AddSpamPolicy;
 import com.example.spam.repository.MailRepository;
 import com.example.spam.repository.SpamRepository;
 import com.example.spam.repository.SpamStaticsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 public class SpamService {
@@ -87,16 +93,26 @@ public class SpamService {
 
     @Transactional
     public void addSpam(MailChangedToSpamEventDto mailChangedToSpamEventDto) {
-        Spam spam = spamRepository.findById(mailChangedToSpamEventDto.getMailId()).orElse(null);
-        if (spam != null) {
+        Mail mail = mailRepository.findById(mailChangedToSpamEventDto.getMailId()).orElse(null);
+        if (mail != null) {
+            Spam spam = new Spam(mail.getMailId());
+            spam.setTopic(mail.getMailTopic());
+            spam.setMailContent(mail.getMailContent());
+            spam.setSender(mail.getMailSender());
             spam.setReason(mailChangedToSpamEventDto.getReason());
+
             spamRepository.save(spam);
 
+            // String totalSender = mailChangedToSpamEventDto.getMailSender();
+            // String[] senderSplit = totalSender.split(" ");
+            // String senderName = senderSplit[0].trim();
+            // String senderEmailT = senderSplit[1].trim();
+            // String senderEmail = senderEmailT.replaceAll("[<>]", "");
+
             String totalSender = mailChangedToSpamEventDto.getMailSender();
-            String[] senderSplit = totalSender.split(" ");
-            String senderName = senderSplit[0].trim();
-            String senderEmailT = senderSplit[1].trim();
-            String senderEmail = senderEmailT.replaceAll("[<>]", "");
+            Matcher matcher = Pattern.compile("<(.*?)>").matcher(totalSender);
+
+            String senderEmail = matcher.find() ? matcher.group(1) : "";
 
             Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(senderEmail);
             //Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(mailChangedToSpamEventDto.getMailSender());

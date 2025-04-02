@@ -12,9 +12,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,5 +39,8 @@ public class Spam {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+    public Spam(Integer mailId){
+        this.mailId=mailId;
     }
 }
