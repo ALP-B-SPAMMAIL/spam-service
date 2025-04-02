@@ -2,12 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: spam-service
-  namespace: spam-namespace
 spec:
   selector:
     app: spam-service  # 이 파드랑 연결 
   ports:
     - protocol: TCP 
-      port: 84  # 외부 포트 
+      port: 86  # 외부 포트 
       targetPort: 8080  # 내부 포트 
   type: ClusterIP  # 내부 연결만 -> 인그레스 사용할거니까 
