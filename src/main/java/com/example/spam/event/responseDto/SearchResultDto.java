@@ -10,4 +10,5 @@ public class SearchResultDto {
     public Long count;
     public String topic;
     public String reason;
+    public String mail;
 }

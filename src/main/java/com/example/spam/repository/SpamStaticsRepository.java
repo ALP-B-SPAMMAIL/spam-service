@@ -20,4 +20,7 @@ public interface SpamStaticsRepository extends JpaRepository<SpamStatics, Intege
 
     List<SpamStatics> findByCountGreaterThanEqual(Long count);
 
+    @Query(value = "SELECT * FROM spam_statics ORDER BY count DESC LIMIT 5", nativeQuery = true)
+    List<SpamStatics> findTop5ByCount();
+
 }

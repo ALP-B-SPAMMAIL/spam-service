@@ -1,9 +1,12 @@
 package com.example.spam.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.naming.directory.SearchResult;
 
 import org.apache.kafka.common.annotation.InterfaceStability;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import com.example.spam.event.NotSpamDetectedEvent;
 import com.example.spam.event.SpamDetectedEvent;
 import com.example.spam.event.requestDto.SearchAskDto;
 import com.example.spam.event.responseDto.SearchResultDto;
+import com.example.spam.event.responseDto.TopSpamDto;
 import com.example.spam.eventDto.MailChangedToNormalEventDto;
 import com.example.spam.eventDto.MailChangedToSpamEventDto;
 import com.example.spam.eventDto.MailInboundedEventDto;
@@ -53,7 +57,7 @@ public class SpamService {
             List<SpamStatics> spamStaticsList = spamStaticsRepository.findByCountGreaterThanEqual(10L);
             boolean isSpam = spamStaticsList.stream()
                     .anyMatch(spamStatic -> mailInboundedEventDto.getMailSender().contains(spamStatic.getMail()));
-                
+
             if (isSpam) {
                 Spam spam = Spam.builder()
                     .mailId(mailInboundedEventDto.getMailId())
@@ -142,14 +146,6 @@ public class SpamService {
 
     @Transactional
     public SearchResultDto findSpam(SearchAskDto searchAskDto){
-        // String totalSender = searchAskDto.getSender();
-        // String[] senderSplit = totalSender.split(" ");
-        // String senderName = senderSplit[0].trim();
-        // String senderEmailT = senderSplit[1].trim();
-        // String senderEmail = senderEmailT.replaceAll("[<>]", "");
-
-        //Optional<SpamStatics> spamStatics = spamStaticsRepository.findBySender();
-
         Optional<SpamStatics> spamStatics = spamStaticsRepository.findBySender(searchAskDto.getSender());
 
         SearchResultDto searchResultDto = new SearchResultDto();
@@ -160,9 +156,32 @@ public class SpamService {
             searchResultDto.setSender(spamm.getSender());
             searchResultDto.setTopic(spamm.getTopic());
             searchResultDto.setReason(spamm.getReason());
+            searchResultDto.setMail(spamm.getMail());
         }
 
-
         return searchResultDto;
+    }
+
+    @Transactional
+    public TopSpamDto findTopSpam(){
+        List<SpamStatics> spams = spamStaticsRepository.findTop5ByCount();
+
+        TopSpamDto topSpamDto = new TopSpamDto();
+        List<SearchResultDto> data = new ArrayList<>();
+
+        for(SpamStatics spam : spams){
+            SearchResultDto searchResultDto = new SearchResultDto();
+            searchResultDto.setCount(spam.getCount());
+            searchResultDto.setSender(spam.getSender());
+            searchResultDto.setTopic(spam.getTopic());
+            searchResultDto.setReason(spam.getReason());
+            searchResultDto.setMail(spam.getMail());
+
+            data.add(searchResultDto);
+        }
+
+        topSpamDto.setSearchResultDto(data);
+
+        return topSpamDto;
     }
 }

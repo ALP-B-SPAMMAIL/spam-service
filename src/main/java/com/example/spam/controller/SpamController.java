@@ -12,6 +12,12 @@ import com.example.spam.service.SpamService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.spam.event.responseDto.TopSpamDto;
+
+
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +38,13 @@ public class SpamController {
 
         return ResponseEntity.ok(searchResultDto);
     }
+
+    @GetMapping("/top/spam")
+    public ResponseEntity<TopSpamDto> getTopSpam() {
+        TopSpamDto topSpamDto = spamService.findTopSpam();
+
+        return ResponseEntity.ok(topSpamDto);
+    }
+    
 
 }
