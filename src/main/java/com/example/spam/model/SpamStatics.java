@@ -27,6 +27,7 @@ public class SpamStatics {
     private Long count;
     private String topic;
     private String reason;
+    private String mail;
 
     public SpamStatics(Integer mailId){
         this.mailId=mailId;

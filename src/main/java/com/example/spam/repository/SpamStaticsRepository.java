@@ -1,5 +1,6 @@
 package com.example.spam.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,7 @@ public interface SpamStaticsRepository extends JpaRepository<SpamStatics, Intege
     @Query(value = "SELECT * FROM spam_statics WHERE REPLACE(SUBSTRING_INDEX(sender, '<', -1), '>', '') = :email", 
        nativeQuery = true)
     Optional<SpamStatics> findBySender(@Param("email") String email);
+
+    List<SpamStatics> findByCountGreaterThanEqual(Long count);
 
 }

@@ -1,5 +1,6 @@
 package com.example.spam.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 public class SpamService {
+    private static final Logger logger = LoggerFactory.getLogger(SpamService.class);
+
     @Autowired
     private SpamRepository spamRepository;
     @Autowired
@@ -46,17 +49,18 @@ public class SpamService {
 
     @Transactional
     public boolean isSpam(MailInboundedEventDto mailInboundedEventDto) {
-            try {        
-                System.out.println("isSpam called");
-                System.out.println(mailInboundedEventDto.getMailSender());
-                System.out.println(mailInboundedEventDto.getMailContent());
-                if (mailInboundedEventDto.getMailSender().contains("bhdj0107")) {
+        try {        
+            List<SpamStatics> spamStaticsList = spamStaticsRepository.findByCountGreaterThanEqual(10L);
+            boolean isSpam = spamStaticsList.stream()
+                    .anyMatch(spamStatic -> mailInboundedEventDto.getMailSender().contains(spamStatic.getMail()));
+                
+            if (isSpam) {
                 Spam spam = Spam.builder()
-                .mailId(mailInboundedEventDto.getMailId())
-                .sender(mailInboundedEventDto.getMailSender())
-                .mailContent(mailInboundedEventDto.getMailContent())
-                .whenArrived(mailInboundedEventDto.getMailArrivalTime())
-                .build();
+                    .mailId(mailInboundedEventDto.getMailId())
+                    .sender(mailInboundedEventDto.getMailSender())
+                    .mailContent(mailInboundedEventDto.getMailContent())
+                    .whenArrived(mailInboundedEventDto.getMailArrivalTime())
+                    .build();
                 spamRepository.save(spam);
                 
                 SpamDetectedEvent spamDetectedEvent = new SpamDetectedEvent(new SpamDetectedEventDto(spam));
@@ -127,6 +131,7 @@ public class SpamService {
                 SpamStatics spamN = new SpamStatics();
                 spamN.setSender(mailChangedToSpamEventDto.getMailSender());
                 spamN.setCount(1L);
+                spamN.setMail(senderEmail);
                 spamN.setReason(mailChangedToSpamEventDto.getReason());
 
                 spamStaticsRepository.save(spamN);
