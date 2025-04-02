@@ -17,5 +17,4 @@ public interface SpamStaticsRepository extends JpaRepository<SpamStatics, Intege
        nativeQuery = true)
     Optional<SpamStatics> findBySender(@Param("email") String email);
 
-
 }

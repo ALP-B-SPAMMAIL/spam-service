@@ -20,8 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Spam {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int mailId;
+    private Integer mailId;
 
     private String topic;
     private String sender;
