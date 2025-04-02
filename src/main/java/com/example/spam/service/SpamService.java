@@ -92,9 +92,8 @@ public class SpamService {
             spam.setReason(mailChangedToSpamEventDto.getReason());
             spamRepository.save(spam);
 
-            Mail mail = mailRepository.findByMailId(mailChangedToSpamEventDto.getMailId()).get();
 
-            Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(mail.getMailSender());
+            Optional<SpamStatics> spamStatic = spamStaticsRepository.findBySender(mailChangedToSpamEventDto.getMailSender());
             
             if(spamStatic.isPresent()){
                 SpamStatics spamO = spamStatic.get();
@@ -104,10 +103,9 @@ public class SpamService {
             }
             else{
                 SpamStatics spamN = new SpamStatics();
-                spamN.setSender(mail.getMailSender());
+                spamN.setSender(mailChangedToSpamEventDto.getMailSender());
                 spamN.setCount(1L);
-                spamN.setReason(spam.getReason());
-                spamN.setTopic(spam.getTopic());
+                spamN.setReason(mailChangedToSpamEventDto.getReason());
 
                 spamStaticsRepository.save(spamN);
             }

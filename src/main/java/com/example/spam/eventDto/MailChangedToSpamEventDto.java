@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MailChangedToSpamEventDto extends AbstractDto {
     private int mailId;
+    private String mailContent;
+    private String mailSender;
     private String reason;
-
 }
