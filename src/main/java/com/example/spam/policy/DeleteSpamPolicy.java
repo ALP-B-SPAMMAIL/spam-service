@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Service;
 
 import com.example.spam.event.MailChangedToNormalEvent;
 import com.example.spam.eventDto.MailChangedToNormalEventDto;
@@ -11,6 +12,7 @@ import com.example.spam.service.SpamService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+@Service
 public class DeleteSpamPolicy {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
